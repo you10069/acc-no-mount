@@ -185,23 +185,24 @@ mkdir -p $tmpd
 
 
 ###
-! $magisk || {
-
-  # create executable wrappers to avoid rebooting unnecessarily
-  mkdir -p $installDir/system/bin
-
-  for i in ${id}.sh:$id ${id}.sh:${id}d, ${id}.sh:${id}d. ${id}a.sh:${id}a service.sh:${id}d; do
-    j=$installDir/system/bin/${i#*:}
-    [ ! -h $j ] || rm $j
-    echo "#!/system/bin/sh
-#exec_wrapper
-if [ -f $tmpd/.updated ]; then
-  exec /dev/${i#*:} \"\$@\"
-else
-  exec . /data/adb/$domain/$id/${i%:*} \"\$@\"
-fi" > $j
-  done
-}
+# Disabled: No need to mount commands to /system/bin
+# ! $magisk || {
+# 
+#   # create executable wrappers to avoid rebooting unnecessarily
+#   mkdir -p $installDir/system/bin
+# 
+#   for i in ${id}.sh:$id ${id}.sh:${id}d, ${id}.sh:${id}d. ${id}a.sh:${id}a service.sh:${id}d; do
+#     j=$installDir/system/bin/${i#*:}
+#     [ ! -h $j ] || rm $j
+#     echo "#!/system/bin/sh
+# #exec_wrapper
+# if [ -f $tmpd/.updated ]; then
+#   exec /dev/${i#*:} \"\$@\"
+# else
+#   exec . /data/adb/$domain/$id/${i%:*} \"\$@\"
+# fi" > $j
+#   done
+# }
 
 
 ###
