@@ -2,9 +2,1429 @@
 <html lang="en">
   <head>
     <meta charset="utf-8"/>
-    <title>ACC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ACC - Advanced Charging Controller</title>
+    <style>
+      :root {
+        --primary: #4CAF50;
+        --primary-dark: #388E3C;
+        --secondary: #2196F3;
+        --danger: #f44336;
+        --warning: #ff9800;
+        --background: #1a1a2e;
+        --surface: #16213e;
+        --surface-light: #0f3460;
+        --text: #eaeaea;
+        --text-muted: #a0a0a0;
+        --border: #2d3748;
+        --success: #4CAF50;
+        --info: #2196F3;
+      }
+      
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--background);
+        color: var(--text);
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+      
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      
+      header {
+        background: linear-gradient(135deg, var(--surface), var(--surface-light));
+        padding: 30px 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      }
+      
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .subtitle {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+      }
+      
+      .status-bar {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(0,0,0,0.2);
+        border-radius: 10px;
+      }
+      
+      .status-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        background: var(--surface);
+        border-radius: 8px;
+        font-size: 0.9rem;
+      }
+      
+      .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--success);
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      
+      .nav-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+      }
+      
+      .nav-tab {
+        padding: 12px 25px;
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        color: var(--text);
+      }
+      
+      .nav-tab:hover {
+        background: var(--surface-light);
+        border-color: var(--primary);
+      }
+      
+      .nav-tab.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+      }
+      
+      .tab-content {
+        display: none;
+      }
+      
+      .tab-content.active {
+        display: block;
+      }
+      
+      .card {
+        background: var(--surface);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        border: 1px solid var(--border);
+      }
+      
+      .card-title {
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+      
+      .form-group {
+        margin-bottom: 20px;
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text);
+      }
+      
+      .form-group .description {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 5px;
+        line-height: 1.4;
+      }
+      
+      input[type="number"],
+      input[type="text"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px 15px;
+        background: var(--background);
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+      
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+      
+      input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
+      
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        background: var(--background);
+        border-radius: 8px;
+        border: 2px solid var(--border);
+      }
+      
+      .checkbox-group label {
+        margin: 0;
+        cursor: pointer;
+        flex: 1;
+      }
+      
+      .btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+      
+      .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+      }
+      
+      .btn-secondary {
+        background: var(--secondary);
+        color: white;
+      }
+      
+      .btn-secondary:hover {
+        background: #1976D2;
+        transform: translateY(-2px);
+      }
+      
+      .btn-danger {
+        background: var(--danger);
+        color: white;
+      }
+      
+      .btn-danger:hover {
+        background: #d32f2f;
+        transform: translateY(-2px);
+      }
+      
+      .btn-warning {
+        background: var(--warning);
+        color: white;
+      }
+      
+      .btn-warning:hover {
+        background: #f57c00;
+        transform: translateY(-2px);
+      }
+      
+      .btn-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 25px;
+      }
+      
+      .preset-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+      
+      .preset-card {
+        background: var(--background);
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .preset-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.2);
+      }
+      
+      .preset-card.selected {
+        border-color: var(--primary);
+        background: rgba(76, 175, 80, 0.1);
+      }
+      
+      .preset-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 10px;
+      }
+      
+      .preset-description {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+      }
+      
+      .preset-settings {
+        font-size: 0.85rem;
+        background: var(--surface);
+        padding: 10px;
+        border-radius: 6px;
+        max-height: 150px;
+        overflow-y: auto;
+      }
+      
+      .preset-setting {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      
+      .preset-setting:last-child {
+        border-bottom: none;
+      }
+      
+      .range-slider {
+        width: 100%;
+        margin: 10px 0;
+      }
+      
+      .range-value {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+      
+      .toggle-switch {
+        position: relative;
+        width: 60px;
+        height: 30px;
+      }
+      
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--border);
+        transition: 0.4s;
+        border-radius: 30px;
+      }
+      
+      .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 24px;
+        width: 24px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+      
+      input:checked + .toggle-slider {
+        background-color: var(--primary);
+      }
+      
+      input:checked + .toggle-slider:before {
+        transform: translateX(30px);
+      }
+      
+      .alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      
+      .alert-info {
+        background: rgba(33, 150, 243, 0.1);
+        border-left: 4px solid var(--info);
+        color: var(--info);
+      }
+      
+      .alert-warning {
+        background: rgba(255, 152, 0, 0.1);
+        border-left: 4px solid var(--warning);
+        color: var(--warning);
+      }
+      
+      .alert-success {
+        background: rgba(76, 175, 80, 0.1);
+        border-left: 4px solid var(--success);
+        color: var(--success);
+      }
+      
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        padding: 15px 25px;
+        background: var(--surface);
+        border-radius: 10px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+        border-left: 4px solid var(--primary);
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+      }
+      
+      .toast.show {
+        transform: translateX(0);
+      }
+      
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid var(--border);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      
+      .battery-icon {
+        font-size: 2rem;
+        margin-right: 10px;
+      }
+      
+      .value-display {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 1.1rem;
+      }
+      
+      .section-divider {
+        height: 2px;
+        background: linear-gradient(to right, var(--border), var(--primary), var(--border));
+        margin: 30px 0;
+        border: none;
+      }
+      
+      .help-tooltip {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: var(--surface-light);
+        border-radius: 50%;
+        text-align: center;
+        line-height: 20px;
+        cursor: help;
+        margin-left: 5px;
+        font-size: 0.8rem;
+      }
+      
+      .advanced-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        padding: 15px;
+        background: var(--background);
+        border-radius: 8px;
+        margin-bottom: 20px;
+        user-select: none;
+      }
+      
+      .advanced-content {
+        display: none;
+      }
+      
+      .advanced-content.show {
+        display: block;
+      }
+      
+      @media (max-width: 768px) {
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .btn-group {
+          flex-direction: column;
+        }
+        
+        .btn {
+          width: 100%;
+          justify-content: center;
+        }
+        
+        h1 {
+          font-size: 1.8rem;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello There!</h1>
+    <div class="container">
+      <header>
+        <h1>⚡ ACC - Advanced Charging Controller</h1>
+        <p class="subtitle">KernelSU WebUI - Configure your charging settings on the fly</p>
+        
+        <div class="status-bar">
+          <div class="status-item">
+            <div class="status-indicator"></div>
+            <span>Daemon Status: <strong id="daemonStatus">Running</strong></span>
+          </div>
+          <div class="status-item">
+            <span class="battery-icon">🔋</span>
+            <span>Level: <strong id="batteryLevel">--%</strong></span>
+          </div>
+          <div class="status-item">
+            <span>Temperature: <strong id="batteryTemp">--°C</strong></span>
+          </div>
+          <div class="status-item">
+            <span>Status: <strong id="chargingStatus">--</strong></span>
+          </div>
+        </div>
+      </header>
+      
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="presets">🎯 Presets</button>
+        <button class="nav-tab" data-tab="basic">⚙️ Basic Settings</button>
+        <button class="nav-tab" data-tab="capacity">📊 Capacity Control</button>
+        <button class="nav-tab" data-tab="temperature">🌡️ Temperature</button>
+        <button class="nav-tab" data-tab="cooldown">❄️ Cooldown</button>
+        <button class="nav-tab" data-tab="advanced">🔧 Advanced</button>
+        <button class="nav-tab" data-tab="actions">⚡ Actions</button>
+      </nav>
+      
+      <!-- Presets Tab -->
+      <div id="presets" class="tab-content active">
+        <div class="card">
+          <h2 class="card-title">🎯 Quick Presets</h2>
+          <p style="margin-bottom: 20px; color: var(--text-muted);">Select a preset configuration based on your usage pattern. Don't know what to do? Start with one of these!</p>
+          
+          <div class="preset-grid">
+            <div class="preset-card" data-preset="balanced">
+              <div class="preset-name">⚖️ Balanced (Recommended)</div>
+              <div class="preset-description">Perfect for daily use. Balances battery health and convenience.</div>
+              <div class="preset-settings">
+                <div class="preset-setting"><span>Pause Capacity:</span><span>80%</span></div>
+                <div class="preset-setting"><span>Resume Capacity:</span><span>75%</span></div>
+                <div class="preset-setting"><span>Max Temp:</span><span>45°C</span></div>
+                <div class="preset-setting"><span>Cooldown Temp:</span><span>40°C</span></div>
+              </div>
+            </div>
+            
+            <div class="preset-card" data-preset="battery-saver">
+              <div class="preset-name">🔋 Battery Saver</div>
+              <div class="preset-description">Maximizes battery longevity. Ideal for forever-plugged setups.</div>
+              <div class="preset-settings">
+                <div class="preset-setting"><span>Pause Capacity:</span><span>60%</span></div>
+                <div class="preset-setting"><span>Resume Capacity:</span><span>55%</span></div>
+                <div class="preset-setting"><span>Max Temp:</span><span>40°C</span></div>
+                <div class="preset-setting"><span>Cooldown:</span><span>Enabled</span></div>
+              </div>
+            </div>
+            
+            <div class="preset-card" data-preset="fast-charge">
+              <div class="preset-name">⚡ Fast Charge</div>
+              <div class="preset-description">Prioritizes charging speed. Use when you need quick power.</div>
+              <div class="preset-settings">
+                <div class="preset-setting"><span>Pause Capacity:</span><span>90%</span></div>
+                <div class="preset-setting"><span>Resume Capacity:</span><span>85%</span></div>
+                <div class="preset-setting"><span>Max Temp:</span><span>50°C</span></div>
+                <div class="preset-setting"><span>Cooldown:</span><span>Disabled</span></div>
+              </div>
+            </div>
+            
+            <div class="preset-card" data-preset="gaming">
+              <div class="preset-name">🎮 Gaming Mode</div>
+              <div class="preset-description">Optimized for gaming while plugged in. Prevents overheating.</div>
+              <div class="preset-settings">
+                <div class="preset-setting"><span>Pause Capacity:</span><span>70%</span></div>
+                <div class="preset-setting"><span>Resume Capacity:</span><span>65%</span></div>
+                <div class="preset-setting"><span>Max Temp:</span><span>42°C</span></div>
+                <div class="preset-setting"><span>Idle Mode:</span><span>Priority</span></div>
+              </div>
+            </div>
+            
+            <div class="preset-card" data-preset="night">
+              <div class="preset-name">🌙 Night Charge</div>
+              <div class="preset-description">Safe overnight charging with aggressive cooldown cycles.</div>
+              <div class="preset-settings">
+                <div class="preset-setting"><span>Pause Capacity:</span><span>75%</span></div>
+                <div class="preset-setting"><span>Resume Capacity:</span><span>70%</span></div>
+                <div class="preset-setting"><span>Cooldown Charge:</span><span>50s</span></div>
+                <div class="preset-setting"><span>Cooldown Pause:</span><span>10s</span></div>
+              </div>
+            </div>
+            
+            <div class="preset-card" data-preset="custom">
+              <div class="preset-name">🛠️ Custom</div>
+              <div class="preset-description">Your own configuration. Mix and match settings below.</div>
+              <div class="preset-settings">
+                <div class="preset-setting"><span>Mode:</span><span>Fully Customizable</span></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="applySelectedPreset()">Apply Selected Preset</button>
+            <button class="btn btn-secondary" onclick="loadCurrentConfig()">Load Current Config</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Basic Settings Tab -->
+      <div id="basic" class="tab-content">
+        <div class="card">
+          <h2 class="card-title">⚙️ Basic Settings</h2>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Language</label>
+              <select id="language">
+                <option value="en">English</option>
+                <option value="zh">Chinese</option>
+                <option value="es">Spanish</option>
+                <option value="pt">Portuguese</option>
+                <option value="ru">Russian</option>
+              </select>
+              <div class="description">Display language for the interface</div>
+            </div>
+            
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="battStatusWorkaround" checked>
+                <label for="battStatusWorkaround">Battery Status Workaround</label>
+              </div>
+              <div class="description">Improved compatibility for status detection</div>
+            </div>
+            
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="prioritizeBattIdleMode" checked>
+                <label for="prioritizeBattIdleMode">Prioritize Battery Idle Mode</label>
+              </div>
+              <div class="description">Use bypass/standby mode when available</div>
+            </div>
+            
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="offMid">
+                <label for="offMid">Turn Off After Reboot (if mid-range)</label>
+              </div>
+              <div class="description">Disable charging after reboot if capacity is between resume and pause</div>
+            </div>
+            
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="rebootResume">
+                <label for="rebootResume">Resume After Reboot</label>
+              </div>
+              <div class="description">Automatically resume charging after system reboot</div>
+            </div>
+            
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="forceOff">
+                <label for="forceOff">Force Off (Last Resort)</label>
+              </div>
+              <div class="description">Only enable if charging switch is stubbornly reset</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Capacity Control Tab -->
+      <div id="capacity" class="tab-content">
+        <div class="card">
+          <h2 class="card-title">📊 Capacity Control</h2>
+          
+          <div class="alert alert-info">
+            ℹ️ Set the battery levels at which charging should pause and resume. This is the core feature for battery health.
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Pause Capacity (%) <span class="help-tooltip" title="Battery level at which charging stops">?</span></label>
+              <input type="number" id="pauseCapacity" min="0" max="100" value="80">
+              <div class="range-value">
+                <span>0%</span>
+                <span class="value-display" id="pauseCapacityValue">80%</span>
+                <span>100%</span>
+              </div>
+              <input type="range" class="range-slider" id="pauseCapacitySlider" min="0" max="100" value="80">
+              <div class="description">Charging will stop when battery reaches this level</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Resume Capacity (%) <span class="help-tooltip" title="Battery level at which charging resumes">?</span></label>
+              <input type="number" id="resumeCapacity" min="0" max="100" value="75">
+              <div class="range-value">
+                <span>0%</span>
+                <span class="value-display" id="resumeCapacityValue">75%</span>
+                <span>100%</span>
+              </div>
+              <input type="range" class="range-slider" id="resumeCapacitySlider" min="0" max="100" value="75">
+              <div class="description">Charging will resume when battery drops to this level</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Shutdown Capacity (%) <span class="help-tooltip" title="Battery level at which device shuts down">?</span></label>
+              <input type="number" id="shutdownCapacity" min="0" max="100" value="5">
+              <div class="range-value">
+                <span>0%</span>
+                <span class="value-display" id="shutdownCapacityValue">5%</span>
+                <span>100%</span>
+              </div>
+              <input type="range" class="range-slider" id="shutdownCapacitySlider" min="0" max="100" value="5">
+              <div class="description">Device will shutdown at this battery level</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Cooldown Capacity (%) <span class="help-tooltip" title="Battery level at which cooldown cycle starts">?</span></label>
+              <input type="number" id="cooldownCapacity" min="0" max="101" value="101">
+              <div class="range-value">
+                <span>0%</span>
+                <span class="value-display" id="cooldownCapacityValue">101% (Disabled)</span>
+                <span>101%</span>
+              </div>
+              <input type="range" class="range-slider" id="cooldownCapacitySlider" min="0" max="101" value="101">
+              <div class="description">Set to 101 to disable cooldown based on capacity</div>
+            </div>
+            
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="capacityMask">
+                <label for="capacityMask">Mask Capacity Limits</label>
+              </div>
+              <div class="description">Hide capacity limits from Android (shows 0-100% scale)</div>
+            </div>
+            
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="allowIdleAbovePcap" checked>
+                <label for="allowIdleAbovePcap">Allow Idle Above Pause Capacity</label>
+              </div>
+              <div class="description">Enable idle mode even when above pause capacity</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Temperature Tab -->
+      <div id="temperature" class="tab-content">
+        <div class="card">
+          <h2 class="card-title">🌡️ Temperature Control</h2>
+          
+          <div class="alert alert-warning">
+            ⚠️ High temperatures accelerate battery degradation. Keep these values conservative for long-term health.
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Maximum Temperature (°C) <span class="help-tooltip" title="Charging pauses at this temperature">?</span></label>
+              <input type="number" id="maxTemp" min="30" max="60" value="45">
+              <div class="range-value">
+                <span>30°C</span>
+                <span class="value-display" id="maxTempValue">45°C</span>
+                <span>60°C</span>
+              </div>
+              <input type="range" class="range-slider" id="maxTempSlider" min="30" max="60" value="45">
+              <div class="description">Charging will pause when battery reaches this temperature</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Resume Temperature (°C) <span class="help-tooltip" title="Charging resumes when temp drops to this">?</span></label>
+              <input type="number" id="resumeTemp" min="25" max="55" value="40">
+              <div class="range-value">
+                <span>25°C</span>
+                <span class="value-display" id="resumeTempValue">40°C</span>
+                <span>55°C</span>
+              </div>
+              <input type="range" class="range-slider" id="resumeTempSlider" min="25" max="55" value="40">
+              <div class="description">Charging resumes when temperature drops to this level</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Cooldown Temperature (°C) <span class="help-tooltip" title="Temperature at which cooldown cycle starts">?</span></label>
+              <input type="number" id="cooldownTemp" min="30" max="55" value="40">
+              <div class="range-value">
+                <span>30°C</span>
+                <span class="value-display" id="cooldownTempValue">40°C</span>
+                <span>55°C</span>
+              </div>
+              <input type="range" class="range-slider" id="cooldownTempSlider" min="30" max="55" value="40">
+              <div class="description">Start cooldown cycle when reaching this temperature</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Shutdown Temperature (°C) <span class="help-tooltip" title="Emergency shutdown temperature">?</span></label>
+              <input type="number" id="shutdownTemp" min="50" max="70" value="55">
+              <div class="range-value">
+                <span>50°C</span>
+                <span class="value-display" id="shutdownTempValue">55°C</span>
+                <span>70°C</span>
+              </div>
+              <input type="range" class="range-slider" id="shutdownTempSlider" min="50" max="70" value="55">
+              <div class="description">Emergency shutdown to prevent damage</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Temperature Level (%) <span class="help-tooltip" title="Manual temperature throttling level">?</span></label>
+              <input type="number" id="tempLevel" min="0" max="100" value="0">
+              <div class="range-value">
+                <span>0%</span>
+                <span class="value-display" id="tempLevelValue">0% (Disabled)</span>
+                <span>100%</span>
+              </div>
+              <input type="range" class="range-slider" id="tempLevelSlider" min="0" max="100" value="0">
+              <div class="description">Manually limit charging based on temperature profile</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Cooldown Tab -->
+      <div id="cooldown" class="tab-content">
+        <div class="card">
+          <h2 class="card-title">❄️ Cooldown Cycle</h2>
+          
+          <div class="alert alert-info">
+            ℹ️ Cooldown cycling reduces battery stress by periodically pausing charging or reducing current.
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Cooldown Current (mA) <span class="help-tooltip" title="Reduced current during cooldown pause">?</span></label>
+              <input type="number" id="cooldownCurrent" min="0" max="5000" value="500" placeholder="e.g., 500 or 50%">
+              <div class="description">Limit current during cooldown (or use percentage like 50%)</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Cooldown Charge Duration (seconds)</label>
+              <input type="number" id="cooldownCharge" min="0" max="300" value="50">
+              <div class="range-value">
+                <span>0s</span>
+                <span class="value-display" id="cooldownChargeValue">50s</span>
+                <span>300s</span>
+              </div>
+              <input type="range" class="range-slider" id="cooldownChargeSlider" min="0" max="300" value="50">
+              <div class="description">How long to charge normally before cooldown pause</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Cooldown Pause Duration (seconds)</label>
+              <input type="number" id="cooldownPause" min="0" max="120" value="10">
+              <div class="range-value">
+                <span>0s</span>
+                <span class="value-display" id="cooldownPauseValue">10s</span>
+                <span>120s</span>
+              </div>
+              <input type="range" class="range-slider" id="cooldownPauseSlider" min="0" max="120" value="10">
+              <div class="description">How long to pause/reduce charging during cooldown</div>
+            </div>
+            
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="currentWorkaround">
+                <label for="currentWorkaround">Current Workaround</label>
+              </div>
+              <div class="description">Only use current control files matching "batt"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Advanced Tab -->
+      <div id="advanced" class="tab-content">
+        <div class="card">
+          <h2 class="card-title">🔧 Advanced Settings</h2>
+          
+          <div class="alert alert-warning">
+            ⚠️ Only modify these if you understand what they do. Incorrect settings may cause issues.
+          </div>
+          
+          <div class="advanced-toggle" onclick="toggleAdvanced()">
+            <span>📋 Show Advanced Options</span>
+            <span id="advancedToggleIcon">▼</span>
+          </div>
+          
+          <div class="advanced-content" id="advancedContent">
+            <hr class="section-divider">
+            
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Amp Factor</label>
+                <select id="ampFactor">
+                  <option value="">Auto</option>
+                  <option value="1000">1000 (mA)</option>
+                  <option value="1000000">1000000 (µA)</option>
+                </select>
+                <div class="description">Unit multiplier for current conversion</div>
+              </div>
+              
+              <div class="form-group">
+                <label>Volt Factor</label>
+                <select id="voltFactor">
+                  <option value="">Auto</option>
+                  <option value="1000">1000 (mV)</option>
+                  <option value="1000000">1000000 (µV)</option>
+                </select>
+                <div class="description">Unit multiplier for voltage conversion</div>
+              </div>
+              
+              <div class="form-group">
+                <label>Idle Apps</label>
+                <input type="text" id="idleApps" placeholder="com.example.app, com.another.app">
+                <div class="description">Comma-separated app package names for idle mode</div>
+              </div>
+              
+              <div class="form-group">
+                <label>Max Charging Current (mA)</label>
+                <input type="number" id="maxChargingCurrent" min="0" max="9999" placeholder="e.g., 1500">
+                <div class="description">Limit maximum charging current</div>
+              </div>
+              
+              <div class="form-group">
+                <label>Max Charging Voltage (mV)</label>
+                <input type="number" id="maxChargingVoltage" min="0" max="4300" placeholder="e.g., 4000">
+                <div class="description">Limit maximum charging voltage</div>
+              </div>
+              
+              <div class="form-group">
+                <label>Battery Status Override</label>
+                <select id="battStatusOverride">
+                  <option value="">None</option>
+                  <option value="Idle">Idle</option>
+                  <option value="Discharging">Discharging</option>
+                </select>
+                <div class="description">Override battery status detection</div>
+              </div>
+              
+              <div class="form-group">
+                <label>Run Command on Pause</label>
+                <input type="text" id="runCmdOnPause" placeholder="Command to execute when charging pauses">
+                <div class="description">Shell command to run when charging is paused</div>
+              </div>
+              
+              <div class="form-group">
+                <label>Apply on Boot</label>
+                <input type="text" id="applyOnBoot" placeholder="CTRL_FILE::VALUE::DEFAULT">
+                <div class="description">Commands to apply on boot/daemon start</div>
+              </div>
+              
+              <div class="form-group">
+                <label>Apply on Plug</label>
+                <input type="text" id="applyOnPlug" placeholder="CTRL_FILE::VALUE::DEFAULT">
+                <div class="description">Commands to apply when charger is plugged</div>
+              </div>
+              
+              <div class="form-group">
+                <label>Charging Switch</label>
+                <input type="text" id="chargingSwitch" placeholder="CTRL_FILE ON OFF">
+                <div class="description">Manual charging switch override</div>
+              </div>
+              
+              <div class="form-group">
+                <div class="checkbox-group">
+                  <input type="checkbox" id="resetBattStatsPause">
+                  <label for="resetBattStatsPause">Reset Battery Stats on Pause</label>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <div class="checkbox-group">
+                  <input type="checkbox" id="resetBattStatsUnplug">
+                  <label for="resetBattStatsUnplug">Reset Battery Stats on Unplug</label>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <div class="checkbox-group">
+                  <input type="checkbox" id="resetBattStatsPlug">
+                  <label for="resetBattStatsPlug">Reset Battery Stats on Plug</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Actions Tab -->
+      <div id="actions" class="tab-content">
+        <div class="card">
+          <h2 class="card-title">⚡ Actions</h2>
+          
+          <div class="alert alert-info">
+            ℹ️ Perform actions on the ACC daemon and configuration.
+          </div>
+          
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="saveConfig()">💾 Save Configuration</button>
+            <button class="btn btn-secondary" onclick="restartDaemon()">🔄 Restart Daemon</button>
+            <button class="btn btn-warning" onclick="stopDaemon()">⏹️ Stop Daemon</button>
+            <button class="btn btn-danger" onclick="resetToDefaults()">🗑️ Reset to Defaults</button>
+          </div>
+          
+          <hr class="section-divider">
+          
+          <h3 style="margin-bottom: 15px;">Quick Commands</h3>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="executeCommand('acc --force')">Force Mode</button>
+            <button class="btn btn-secondary" onclick="executeCommand('acc --shutdown')">Shutdown Mode</button>
+            <button class="btn btn-secondary" onclick="executeCommand('acc --idle')">Idle Mode</button>
+            <button class="btn btn-secondary" onclick="executeCommand('acc --continue')">Continue Mode</button>
+          </div>
+          
+          <hr class="section-divider">
+          
+          <h3 style="margin-bottom: 15px;">System Information</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Current Configuration</label>
+              <textarea id="configOutput" rows="10" readonly style="font-family: monospace; font-size: 0.85rem;"></textarea>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="refreshConfig()">🔄 Refresh Info</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="toast" id="toast">
+      <span id="toastMessage">Configuration saved successfully!</span>
+    </div>
+    
+    <script>
+      // State management
+      let currentConfig = {};
+      let selectedPreset = null;
+      
+      // Preset configurations
+      const presets = {
+        'balanced': {
+          pauseCapacity: 80,
+          resumeCapacity: 75,
+          maxTemp: 45,
+          resumeTemp: 40,
+          cooldownTemp: 40,
+          cooldownCharge: 50,
+          cooldownPause: 10,
+          prioritizeBattIdleMode: true,
+          battStatusWorkaround: true,
+          allowIdleAbovePcap: true,
+          offMid: false
+        },
+        'battery-saver': {
+          pauseCapacity: 60,
+          resumeCapacity: 55,
+          maxTemp: 40,
+          resumeTemp: 35,
+          cooldownTemp: 35,
+          cooldownCharge: 40,
+          cooldownPause: 15,
+          cooldownCurrent: 300,
+          prioritizeBattIdleMode: true,
+          battStatusWorkaround: true,
+          allowIdleAbovePcap: true,
+          offMid: true
+        },
+        'fast-charge': {
+          pauseCapacity: 90,
+          resumeCapacity: 85,
+          maxTemp: 50,
+          resumeTemp: 45,
+          cooldownTemp: 45,
+          prioritizeBattIdleMode: false,
+          battStatusWorkaround: true,
+          allowIdleAbovePcap: false,
+          offMid: false
+        },
+        'gaming': {
+          pauseCapacity: 70,
+          resumeCapacity: 65,
+          maxTemp: 42,
+          resumeTemp: 38,
+          cooldownTemp: 38,
+          cooldownCharge: 30,
+          cooldownPause: 10,
+          prioritizeBattIdleMode: true,
+          battStatusWorkaround: true,
+          allowIdleAbovePcap: true,
+          offMid: false
+        },
+        'night': {
+          pauseCapacity: 75,
+          resumeCapacity: 70,
+          maxTemp: 43,
+          resumeTemp: 38,
+          cooldownTemp: 38,
+          cooldownCharge: 50,
+          cooldownPause: 10,
+          cooldownCurrent: 400,
+          prioritizeBattIdleMode: true,
+          battStatusWorkaround: true,
+          allowIdleAbovePcap: true,
+          offMid: true
+        }
+      };
+      
+      // Initialize
+      document.addEventListener('DOMContentLoaded', function() {
+        initTabs();
+        initSliders();
+        loadCurrentConfig();
+        startStatusUpdates();
+      });
+      
+      // Tab navigation
+      function initTabs() {
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+          tab.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            this.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+          });
+        });
+      }
+      
+      // Slider synchronization
+      function initSliders() {
+        const sliders = [
+          { slider: 'pauseCapacitySlider', input: 'pauseCapacity', display: 'pauseCapacityValue', suffix: '%' },
+          { slider: 'resumeCapacitySlider', input: 'resumeCapacity', display: 'resumeCapacityValue', suffix: '%' },
+          { slider: 'shutdownCapacitySlider', input: 'shutdownCapacity', display: 'shutdownCapacityValue', suffix: '%' },
+          { slider: 'cooldownCapacitySlider', input: 'cooldownCapacity', display: 'cooldownCapacityValue', suffix: '%', special: true },
+          { slider: 'maxTempSlider', input: 'maxTemp', display: 'maxTempValue', suffix: '°C' },
+          { slider: 'resumeTempSlider', input: 'resumeTemp', display: 'resumeTempValue', suffix: '°C' },
+          { slider: 'cooldownTempSlider', input: 'cooldownTemp', display: 'cooldownTempValue', suffix: '°C' },
+          { slider: 'shutdownTempSlider', input: 'shutdownTemp', display: 'shutdownTempValue', suffix: '°C' },
+          { slider: 'tempLevelSlider', input: 'tempLevel', display: 'tempLevelValue', suffix: '%', special: true },
+          { slider: 'cooldownChargeSlider', input: 'cooldownCharge', display: 'cooldownChargeValue', suffix: 's' },
+          { slider: 'cooldownPauseSlider', input: 'cooldownPause', display: 'cooldownPauseValue', suffix: 's' }
+        ];
+        
+        sliders.forEach(({ slider, input, display, suffix, special }) => {
+          const sliderEl = document.getElementById(slider);
+          const inputEl = document.getElementById(input);
+          const displayEl = document.getElementById(display);
+          
+          if (!sliderEl || !inputEl || !displayEl) return;
+          
+          sliderEl.addEventListener('input', function() {
+            inputEl.value = this.value;
+            updateDisplay(displayEl, this.value, suffix, special);
+          });
+          
+          inputEl.addEventListener('input', function() {
+            sliderEl.value = this.value;
+            updateDisplay(displayEl, this.value, suffix, special);
+          });
+        });
+      }
+      
+      function updateDisplay(element, value, suffix, special) {
+        if (special && value == 101) {
+          element.textContent = value + ' (Disabled)';
+        } else if (special && value == 0 && suffix === '%') {
+          element.textContent = value + ' (Disabled)';
+        } else {
+          element.textContent = value + suffix;
+        }
+      }
+      
+      // Preset selection
+      document.querySelectorAll('.preset-card').forEach(card => {
+        card.addEventListener('click', function() {
+          document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedPreset = this.getAttribute('data-preset');
+        });
+      });
+      
+      function applySelectedPreset() {
+        if (!selectedPreset) {
+          showToast('Please select a preset first!', 'warning');
+          return;
+        }
+        
+        if (selectedPreset === 'custom') {
+          showToast('Custom mode selected. Configure settings manually.', 'info');
+          return;
+        }
+        
+        const preset = presets[selectedPreset];
+        if (!preset) return;
+        
+        // Apply preset values
+        Object.keys(preset).forEach(key => {
+          const element = document.getElementById(key);
+          if (element) {
+            if (element.type === 'checkbox') {
+              element.checked = preset[key];
+            } else {
+              element.value = preset[key];
+              // Trigger input event to update displays
+              element.dispatchEvent(new Event('input'));
+            }
+          }
+        });
+        
+        showToast(`Applied "${selectedPreset.replace('-', ' ')}" preset!`, 'success');
+        
+        // Navigate to basic settings tab
+        document.querySelector('[data-tab="basic"]').click();
+      }
+      
+      function loadCurrentConfig() {
+        showToast('Loading current configuration...', 'info');
+        
+        // Simulate loading config (in real implementation, this would fetch from server)
+        setTimeout(() => {
+          // Default values or fetched values would go here
+          document.getElementById('configOutput').value = `# Current ACC Configuration
+# Loaded at: ${new Date().toLocaleString()}
+
+configVerCode=202505180
+allowIdleAbovePcap=true
+battStatusWorkaround=true
+capacity=(5 101 70 75 false)
+cooldownCurrent=
+cooldownRatio=()
+currentWorkaround=false
+forceOff=false
+language=en
+offMid=false
+prioritizeBattIdleMode=true
+rebootResume=false
+resetBattStats=(false false false)
+temperature=(45 50 40 55)
+tempLevel=0
+
+# To modify settings, use the tabs above and click "Save Configuration"`;
+          
+          showToast('Configuration loaded!', 'success');
+        }, 500);
+      }
+      
+      function saveConfig() {
+        showToast('Saving configuration...', 'info');
+        
+        // Collect all form values
+        const config = {
+          // Capacity
+          pauseCapacity: document.getElementById('pauseCapacity').value,
+          resumeCapacity: document.getElementById('resumeCapacity').value,
+          shutdownCapacity: document.getElementById('shutdownCapacity').value,
+          cooldownCapacity: document.getElementById('cooldownCapacity').value,
+          capacityMask: document.getElementById('capacityMask').checked,
+          allowIdleAbovePcap: document.getElementById('allowIdleAbovePcap').checked,
+          
+          // Temperature
+          maxTemp: document.getElementById('maxTemp').value,
+          resumeTemp: document.getElementById('resumeTemp').value,
+          cooldownTemp: document.getElementById('cooldownTemp').value,
+          shutdownTemp: document.getElementById('shutdownTemp').value,
+          tempLevel: document.getElementById('tempLevel').value,
+          
+          // Cooldown
+          cooldownCurrent: document.getElementById('cooldownCurrent').value,
+          cooldownCharge: document.getElementById('cooldownCharge').value,
+          cooldownPause: document.getElementById('cooldownPause').value,
+          currentWorkaround: document.getElementById('currentWorkaround').checked,
+          
+          // Basic
+          language: document.getElementById('language').value,
+          battStatusWorkaround: document.getElementById('battStatusWorkaround').checked,
+          prioritizeBattIdleMode: document.getElementById('prioritizeBattIdleMode').checked,
+          offMid: document.getElementById('offMid').checked,
+          rebootResume: document.getElementById('rebootResume').checked,
+          forceOff: document.getElementById('forceOff').checked,
+          
+          // Advanced
+          ampFactor: document.getElementById('ampFactor').value,
+          voltFactor: document.getElementById('voltFactor').value,
+          idleApps: document.getElementById('idleApps').value,
+          maxChargingCurrent: document.getElementById('maxChargingCurrent').value,
+          maxChargingVoltage: document.getElementById('maxChargingVoltage').value,
+          battStatusOverride: document.getElementById('battStatusOverride').value,
+          runCmdOnPause: document.getElementById('runCmdOnPause').value,
+          applyOnBoot: document.getElementById('applyOnBoot').value,
+          applyOnPlug: document.getElementById('applyOnPlug').value,
+          chargingSwitch: document.getElementById('chargingSwitch').value,
+          resetBattStatsPause: document.getElementById('resetBattStatsPause').checked,
+          resetBattStatsUnplug: document.getElementById('resetBattStatsUnplug').checked,
+          resetBattStatsPlug: document.getElementById('resetBattStatsPlug').checked
+        };
+        
+        console.log('Configuration to save:', config);
+        
+        // In real implementation, send to server via fetch
+        // fetch('/api/save-config', { method: 'POST', body: JSON.stringify(config) })
+        
+        setTimeout(() => {
+          showToast('Configuration saved successfully!', 'success');
+        }, 500);
+      }
+      
+      function restartDaemon() {
+        if (!confirm('Restart the ACC daemon? This will apply new settings.')) return;
+        showToast('Restarting daemon...', 'info');
+        // In real implementation: fetch('/api/restart-daemon')
+        setTimeout(() => showToast('Daemon restarted!', 'success'), 1000);
+      }
+      
+      function stopDaemon() {
+        if (!confirm('Stop the ACC daemon? Charging control will be disabled.')) return;
+        showToast('Stopping daemon...', 'info');
+        // In real implementation: fetch('/api/stop-daemon')
+        setTimeout(() => showToast('Daemon stopped!', 'success'), 1000);
+      }
+      
+      function resetToDefaults() {
+        if (!confirm('Reset ALL settings to defaults? This cannot be undone!')) return;
+        
+        // Reset all fields to default values
+        document.getElementById('pauseCapacity').value = 75;
+        document.getElementById('resumeCapacity').value = 70;
+        document.getElementById('shutdownCapacity').value = 5;
+        document.getElementById('cooldownCapacity').value = 101;
+        document.getElementById('maxTemp').value = 50;
+        document.getElementById('resumeTemp').value = 40;
+        document.getElementById('cooldownTemp').value = 45;
+        document.getElementById('shutdownTemp').value = 55;
+        document.getElementById('tempLevel').value = 0;
+        document.getElementById('cooldownCharge').value = 50;
+        document.getElementById('cooldownPause').value = 10;
+        document.getElementById('cooldownCurrent').value = '';
+        document.getElementById('language').value = 'en';
+        document.getElementById('battStatusWorkaround').checked = true;
+        document.getElementById('prioritizeBattIdleMode').checked = true;
+        document.getElementById('allowIdleAbovePcap').checked = true;
+        document.getElementById('offMid').checked = true;
+        document.getElementById('rebootResume').checked = false;
+        document.getElementById('forceOff').checked = false;
+        document.getElementById('capacityMask').checked = false;
+        document.getElementById('currentWorkaround').checked = false;
+        
+        // Trigger updates
+        document.querySelectorAll('input').forEach(input => input.dispatchEvent(new Event('input')));
+        
+        showToast('Reset to defaults! Click "Save" to apply.', 'success');
+      }
+      
+      function executeCommand(cmd) {
+        showToast(`Executing: ${cmd}...`, 'info');
+        // In real implementation: fetch('/api/execute', { method: 'POST', body: JSON.stringify({ cmd }) })
+        setTimeout(() => showToast('Command executed!', 'success'), 1000);
+      }
+      
+      function refreshConfig() {
+        loadCurrentConfig();
+      }
+      
+      function toggleAdvanced() {
+        const content = document.getElementById('advancedContent');
+        const icon = document.getElementById('advancedToggleIcon');
+        content.classList.toggle('show');
+        icon.textContent = content.classList.contains('show') ? '▲' : '▼';
+      }
+      
+      function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        
+        toastMessage.textContent = message;
+        toast.style.borderLeftColor = type === 'success' ? 'var(--success)' : 
+                                      type === 'warning' ? 'var(--warning)' : 
+                                      type === 'error' ? 'var(--danger)' : 'var(--info)';
+        
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+      
+      function startStatusUpdates() {
+        // Simulate status updates (in real implementation, fetch from server)
+        setInterval(() => {
+          // Update simulated values
+          const level = Math.floor(Math.random() * 20) + 65; // 65-85%
+          const temp = (Math.random() * 5 + 35).toFixed(1); // 35-40°C
+          
+          document.getElementById('batteryLevel').textContent = level + '%';
+          document.getElementById('batteryTemp').textContent = temp + '°C';
+          document.getElementById('chargingStatus').textContent = level >= 80 ? 'Paused' : 'Charging';
+        }, 5000);
+      }
+    </script>
   </body>
 </html>
